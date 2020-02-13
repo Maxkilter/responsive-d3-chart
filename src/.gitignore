@@ -1,0 +1,25 @@
+# See https://help.github.com/ignore-files/ for more about ignoring files.
+
+# dependencies
+/node_modules
+/packages/*/node_modules
+/packages/*/dist
+
+# testing
+/coverage
+/cypress/screenshots
+/cypress/videos
+/cypress/fixtures/generated
+/cypress/fixtures/dashboard-builder/dashboardCreationRequests/generated
+/cypress/snapshots/All\ Specs
+/mochawesome-report
+
+# production
+/.build-configs-temp
+
+# misc
+.DS_STORE
+*.log
+.idea
+.vscode/launch.json
+__diff_output__

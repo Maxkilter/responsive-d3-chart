@@ -1,0 +1,49 @@
+{
+  "private": false,
+  "name": "responsive-d3-chart",
+  "version": "0.0.1",
+  "license": "MIT",
+  "scripts": {
+    "start": "per-env",
+    "start:production": "npm run -s serve",
+    "start:development": "npm run -s dev",
+    "build": "preact build",
+    "serve": "preact build && preact serve",
+    "dev": "preact watch",
+    "lint": "eslint src",
+    "test": "jest"
+  },
+  "eslintConfig": {
+    "extends": "eslint-config-synacor"
+  },
+  "eslintIgnore": [
+    "build/*"
+  ],
+  "devDependencies": {
+    "@testing-library/preact": "1.0.2",
+    "eslint": "^4.9.0",
+    "eslint-config-synacor": "^2.0.2",
+    "jest": "25.1.0",
+    "jest-cli": "25.1.0",
+    "jest-preset-preact": "^1.0.0",
+    "node-sass": "4.12.0",
+    "per-env": "^1.0.2",
+    "preact-cli": "^2.1.0",
+    "preact-cli-plugin-typescript": "0.2.2",
+    "preact-render-spy": "^1.2.1",
+    "sass-loader": "8.0.0",
+    "typescript": "3.6.2"
+  },
+  "dependencies": {
+    "@types/d3": "5.7.2",
+    "axios": "0.19.2",
+    "d3": "5.11.0",
+    "preact": "^8.5.2",
+    "preact-compat": "^3.17.0",
+    "preact-render-to-string": "^4.1.0",
+    "preact-router": "^2.5.7"
+  },
+  "jest": {
+    "preset": "jest-preset-preact"
+  }
+}
