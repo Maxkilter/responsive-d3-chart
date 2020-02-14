@@ -12,6 +12,7 @@ interface Props {
 }
 
 export default class Axis extends Component<Props> {
+	private axisElement: HTMLElement;
 	componentDidMount() {
 		this.renderAxis();
 	}
@@ -28,7 +29,6 @@ export default class Axis extends Component<Props> {
 			.tickPadding([12])
 			.ticks([4]);
 		
-		// @ts-ignore
 		d3Select(this.axisElement).call(axis);
 	}
 
@@ -36,7 +36,6 @@ export default class Axis extends Component<Props> {
 		return (
 			<g
 				className={`Axis Axis-${this.props.orient}`}
-				// @ts-ignore
 				ref={(el) => { this.axisElement = el; }}
 				transform={this.props.translate}
 			/>
