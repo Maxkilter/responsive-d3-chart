@@ -36,7 +36,6 @@
   },
   "dependencies": {
     "@types/d3": "5.7.2",
-    "axios": "0.19.2",
     "d3": "5.11.0",
     "preact": "^8.5.2",
     "preact-compat": "^3.17.0",

@@ -1,6 +1,5 @@
 import { h, Component } from 'preact';
 import {ScaleBand, scaleBand, ScaleLinear, scaleLinear} from 'd3-scale';
-import axios from 'axios';
 import './Chart.css'
 import Axes from '../Axes';
 import Bars from '../Bars';
@@ -28,17 +27,19 @@ class Chart extends Component<{},State> {
 	};
 	
 	async componentDidMount(): Promise<any> {
-		try {
-			const { data } = await axios.get('http://www.mocky.io/v2/5e44b5b03000004e006145bd');
-			const formattedData =	data.map((bar) => ({
-					title: Object.keys(bar)[0],
-					value: Object.values(bar)[0],
-					color: Object.values(bar)[1]
-				})).sort((a:Data,b:Data) => b.value - a.value);
-				
-			this.setState({data: formattedData})
-		}catch (e) {
-			console.log(e)
+		const response =  await fetch('http://www.mocky.io/v2/5e44b5b03000004e006145bd');
+		if (response.ok) {
+			const data = await response.json();
+				const formattedData = data.map((bar) => ({
+						title: Object.keys(bar)[0],
+						value: Object.values(bar)[0],
+						color: Object.values(bar)[1]
+					})).sort((a:Data,b:Data) => b.value - a.value);
+			
+			this.setState({data: formattedData});
+		} else {
+			console.log(response.status);
+			alert("Oops, seems like the server doesn't respond :-(");
 		}
 		window.addEventListener('resize', this.updateDimensions);
 	}
@@ -55,16 +56,16 @@ class Chart extends Component<{},State> {
 		return percents * (value/100)
 	}
 	
-	getwidth() {
+	getWidth() {
 		const percents = 20;
-		const {width} = this.state;
+		const { width } = this.state;
 		return width ? width - this.getPercentage(percents, width)
 		: window.innerWidth - this.getPercentage(percents, window.innerWidth)
 	}
 	
 	getHeight() {
 		const percents = 30;
-		const {height} = this.state;
+		const { height } = this.state;
 		return height ? height - this.getPercentage(percents, height)
 		: window.innerHeight - this.getPercentage(percents, window.innerHeight)
 	}
@@ -74,7 +75,7 @@ class Chart extends Component<{},State> {
 		
 		const margins = { top: 50, right: 20, bottom: 100, left: 60 };
 		const svgDimensions = {
-			width: this.getwidth(),
+			width: this.getWidth(),
 			height: this.getHeight()
 		};
 		
