@@ -2,8 +2,7 @@ import { h } from 'preact';
 
 import Axis from '../Axis';
 
-// eslint-disable-next-line react/display-name
-export default ({ scales, margins, svgDimensions }) => {
+const Axes = ({ scales, margins, svgDimensions }) => {
 	const { height, width } = svgDimensions;
 
 	const xProps = {
@@ -28,3 +27,4 @@ export default ({ scales, margins, svgDimensions }) => {
 	);
 };
 
+export default Axes;
