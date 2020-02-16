@@ -1,10 +1,11 @@
-import { h, Component } from 'preact';
-import Chart from "../Chart";
+import { Component, h } from 'preact';
+
+import Chart from '../Chart';
 
 interface Props {
-    path: any;
+  path: any;
 }
 
 export default class Home extends Component<Props> {
-  public render = () => <Chart />
-};
+  render = () => <Chart />;
+}

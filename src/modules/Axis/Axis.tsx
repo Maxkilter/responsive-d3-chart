@@ -1,6 +1,6 @@
-import { h, Component } from 'preact';
 import * as d3Axis from 'd3-axis';
 import { select as d3Select } from 'd3-selection';
+import { Component, h } from 'preact';
 
 import './Axis.css';
 
@@ -16,11 +16,11 @@ export default class Axis extends Component<Props> {
 	componentDidMount() {
 		this.renderAxis();
 	}
-
+	
 	componentDidUpdate() {
 		this.renderAxis();
 	}
-
+	
 	renderAxis() {
 		const axisType = `axis${this.props.orient}`;
 		const axis = d3Axis[axisType]()
@@ -31,12 +31,14 @@ export default class Axis extends Component<Props> {
 		
 		d3Select(this.axisElement).call(axis);
 	}
-
+	
 	render() {
 		return (
 			<g
 				className={`Axis Axis-${this.props.orient}`}
-				ref={(el) => { this.axisElement = el; }}
+				ref={el => {
+					this.axisElement = el;
+				}}
 				transform={this.props.translate}
 			/>
 		);

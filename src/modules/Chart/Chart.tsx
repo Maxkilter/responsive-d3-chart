@@ -1,9 +1,6 @@
-import { h, Component } from 'preact';
-import {ScaleBand, scaleBand, ScaleLinear, scaleLinear} from 'd3-scale';
-import './Chart.css'
-import Axes from '../Axes';
-import Bars from '../Bars';
-import { Data }  from '../types';
+import { ScaleBand, scaleBand, ScaleLinear, scaleLinear } from 'd3-scale';
+import { Component, h } from 'preact';
+
 //@ts-ignore
 import angry from '../../assets/img/angry.svg';
 //@ts-ignore
@@ -16,6 +13,11 @@ import love from '../../assets/img/love.svg';
 import sad from '../../assets/img/sad.svg';
 //@ts-ignore
 import wow from '../../assets/img/wow.svg';
+import Axes from '../Axes';
+import Bars from '../Bars';
+import { Data } from '../types';
+
+import './Chart.css';
 
 const iconsObj = {
 	like,
@@ -31,9 +33,9 @@ interface State {
 	width: number | null;
 	height: number | null;
 }
-class Chart extends Component<{},State> {
+class Chart extends Component<{}, State> {
 	private xScale: ScaleBand<string>;
-	private yScale:  ScaleLinear<number, number>;
+	private yScale: ScaleLinear<number, number>;
 	
 	constructor() {
 		super();
@@ -48,16 +50,20 @@ class Chart extends Component<{},State> {
 	};
 	
 	async componentDidMount(): Promise<any> {
-		const response =  await fetch('http://www.mocky.io/v2/5e44b5b03000004e006145bd');
+		const response = await fetch(
+			'http://www.mocky.io/v2/5e44b5b03000004e006145bd',
+		);
 		if (response.ok) {
 			const data = await response.json();
-				const formattedData = data.map((bar) => ({
-						title: Object.keys(bar)[0],
-						value: Object.values(bar)[0],
-						color: Object.values(bar)[1]
-					})).sort((a:Data,b:Data) => b.value - a.value);
+			const formattedData = data
+				.map(bar => ({
+					title: Object.keys(bar)[0],
+					value: Object.values(bar)[0],
+					color: Object.values(bar)[1],
+				}))
+				.sort((a: Data, b: Data) => b.value - a.value);
 			
-			this.setState({data: formattedData});
+			this.setState({ data: formattedData });
 		} else {
 			console.log(response.status);
 			alert("Oops, seems like the server doesn't respond :-(");
@@ -74,44 +80,45 @@ class Chart extends Component<{},State> {
 	}
 	
 	getPercentage(percents, value) {
-		return percents * (value/100)
+		return percents * (value / 100);
 	}
 	
 	getWidth(percents) {
 		const { width } = this.state;
-		return width ? width - this.getPercentage(percents, width)
-		: window.innerWidth - this.getPercentage(percents, window.innerWidth)
+		return width
+			? width - this.getPercentage(percents, width)
+			: window.innerWidth - this.getPercentage(percents, window.innerWidth);
 	}
 	
 	getHeight(percents) {
 		const { height } = this.state;
-		return height ? height - this.getPercentage(percents, height)
-		: window.innerHeight - this.getPercentage(percents, window.innerHeight)
+		return height
+			? height - this.getPercentage(percents, height)
+			: window.innerHeight - this.getPercentage(percents, window.innerHeight);
 	}
 	
 	renderIcons() {
 		const icons = [];
-			this.state.data.map(obj => {
-				const iconName = Object.values(obj)[0];
-						for(let key in iconsObj) {
-							if (key === iconName) {
-								icons.push(iconsObj[iconName])
-							}
-						}
-				});
-			
+		this.state.data.map(obj => {
+			const iconName = Object.values(obj)[0];
+			for (const key in iconsObj) {
+				if (key === iconName) {
+					icons.push(iconsObj[iconName]);
+				}
+			}
+		});
+		
 		const width = this.getWidth(97);
 		const marginLeft = this.getWidth(91.3);
 		
 		return icons.map(icon => (
 			<img
-				className='icon'
+				className="icon"
 				src={icon}
 				alt={icon}
-				style={{marginLeft, width}}
+				style={{ marginLeft, width }}
 			/>
-			)
-		);
+		));
 	}
 	
 	render() {
@@ -120,25 +127,29 @@ class Chart extends Component<{},State> {
 		const margins = { top: 50, right: 20, bottom: 100, left: 60 };
 		const svgDimensions = {
 			width: this.getWidth(20),
-			height: this.getHeight(30)
+			height: this.getHeight(30),
 		};
 		
-		const maxValue = Math.max(...data.map((d:Data) => d.value));
+		const maxValue = Math.max(...data.map((d: Data) => d.value));
 		const xScale = this.xScale
 			.padding(0.5)
 			.domain(data.map(d => d.title))
 			.range([margins.left, svgDimensions.width - margins.right]);
-
+		
 		const yScale = this.yScale
 			.domain([0, maxValue])
 			.range([svgDimensions.height - margins.bottom, margins.top]);
 		
 		return (
-			<div className='chart-wrapper' style={{width: svgDimensions.width, height: svgDimensions.height}}>
+			<div
+				className="chart-wrapper"
+				style={{ width: svgDimensions.width, height: svgDimensions.height }}
+			>
 				<svg
 					className="responsive-chart"
 					width={svgDimensions.width}
-					height={svgDimensions.height}>
+					height={svgDimensions.height}
+				>
 					<Axes
 						scales={{ xScale, yScale }}
 						margins={margins}
@@ -154,12 +165,15 @@ class Chart extends Component<{},State> {
 				</svg>
 				<div
 					className="icons-block"
-					style={{width: svgDimensions.width, paddingLeft: this.getWidth(96.5)}}>
+					style={{
+						width: svgDimensions.width,
+						paddingLeft: this.getWidth(96.5),
+					}}
+				>
 					{this.renderIcons()}
 				</div>
 			</div>
-
-		)
+		);
 	}
 }
 
