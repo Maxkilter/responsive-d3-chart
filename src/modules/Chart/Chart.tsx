@@ -1,6 +1,6 @@
-import { ScaleBand, scaleBand, ScaleLinear, scaleLinear } from 'd3-scale';
-import { Component, h } from 'preact';
-
+import { scaleBand, scaleLinear } from 'd3-scale';
+import { h } from 'preact';
+import { useEffect, useState, useMemo } from 'preact/hooks';
 //@ts-ignore
 import angry from '../../assets/img/angry.svg';
 //@ts-ignore
@@ -25,31 +25,18 @@ const iconsObj = {
 	sad,
 	wow,
 	angry,
-	haha,
+	haha
 };
 
-interface State {
-	data: Data | any[];
-	width: number | null;
-	height: number | null;
-}
-class Chart extends Component<{}, State> {
-	private xScale: ScaleBand<string>;
-	private yScale: ScaleLinear<number, number>;
+const Chart = () => {
+	let xScale = scaleBand();
+	let yScale = scaleLinear();
 	
-	constructor() {
-		super();
-		this.xScale = scaleBand();
-		this.yScale = scaleLinear();
-	}
+	const [data, setData] = useState([]);
+	const [width, setWidth] = useState(null);
+	const [height, setHeight] = useState(null);
 	
-	state = {
-		data: [],
-		width: null,
-		height: null,
-	};
-	
-	async componentDidMount(): Promise<any> {
+	useMemo( async () => {
 		const response = await fetch(
 			'http://www.mocky.io/v2/5e44b5b03000004e006145bd',
 		);
@@ -59,47 +46,44 @@ class Chart extends Component<{}, State> {
 				.map(bar => ({
 					title: Object.keys(bar)[0],
 					value: Object.values(bar)[0],
-					color: Object.values(bar)[1],
+					color: Object.values(bar)[1]
 				}))
 				.sort((a: Data, b: Data) => b.value - a.value);
-			
-			this.setState({ data: formattedData });
-		} else {
+				
+			setData(formattedData);
+		}
+		else {
 			console.log(response.status);
 			alert("Oops, seems like the server doesn't respond :-(");
 		}
-		window.addEventListener('resize', this.updateDimensions);
-	}
+	}, []);
 	
-	updateDimensions = () => {
-		this.setState({ width: window.innerWidth, height: window.innerHeight });
+	useEffect(() => {
+		window.addEventListener('resize', updateDimensions);
+		
+		return function cleanup() {
+			window.removeEventListener('resize', updateDimensions);
+		};
+	});
+	
+	const updateDimensions = () => {
+		setWidth(window.innerWidth);
+		setHeight(window.innerHeight);
 	};
 	
-	componentWillUnmount() {
-		window.removeEventListener('resize', this.updateDimensions);
-	}
+	const getPercentage = (percents, value) => percents * (value / 100);
 	
-	getPercentage(percents, value) {
-		return percents * (value / 100);
-	}
+	const	getWidth = (percents) => width
+		? width - getPercentage(percents, width)
+		: window.innerWidth - getPercentage(percents, window.innerWidth);
 	
-	getWidth(percents) {
-		const { width } = this.state;
-		return width
-			? width - this.getPercentage(percents, width)
-			: window.innerWidth - this.getPercentage(percents, window.innerWidth);
-	}
+	const getHeight = (percents) => height
+		? height - getPercentage(percents, height)
+		: window.innerHeight - getPercentage(percents, window.innerHeight);
 	
-	getHeight(percents) {
-		const { height } = this.state;
-		return height
-			? height - this.getPercentage(percents, height)
-			: window.innerHeight - this.getPercentage(percents, window.innerHeight);
-	}
-	
-	renderIcons() {
+	const renderIcons = () => {
 		const icons = [];
-		this.state.data.map(obj => {
+		data.map(obj => {
 			const iconName = Object.values(obj)[0];
 			for (const key in iconsObj) {
 				if (key === iconName) {
@@ -108,73 +92,70 @@ class Chart extends Component<{}, State> {
 			}
 		});
 		
-		const width = this.getWidth(97);
-		const marginLeft = this.getWidth(91.3);
+		const iconWidth = getWidth(97);
+		const marginLeft = getWidth(91.3);
 		
 		return icons.map(icon => (
 			<img
 				className="icon"
 				src={icon}
 				alt={icon}
-				style={{ marginLeft, width }}
+				style={{ marginLeft, width: iconWidth }}
 			/>
 		));
-	}
+	};
+
 	
-	render() {
-		const { data } = this.state;
+	const margins = { top: 50, right: 20, bottom: 100, left: 60 };
+	const svgDimensions = {
+		width: getWidth(20),
+		height: getHeight(30)
+	};
+	
+	const maxValue = Math.max(...data.map((d: Data) => d.value));
+		 xScale = xScale
+		.padding(0.5)
+		.domain(data.map(d => d.title))
+		.range([margins.left, svgDimensions.width - margins.right]);
 		
-		const margins = { top: 50, right: 20, bottom: 100, left: 60 };
-		const svgDimensions = {
-			width: this.getWidth(20),
-			height: this.getHeight(30),
-		};
+		 yScale = yScale
+		.domain([0, maxValue])
+		.range([svgDimensions.height - margins.bottom, margins.top]);
 		
-		const maxValue = Math.max(...data.map((d: Data) => d.value));
-		const xScale = this.xScale
-			.padding(0.5)
-			.domain(data.map(d => d.title))
-			.range([margins.left, svgDimensions.width - margins.right]);
-		
-		const yScale = this.yScale
-			.domain([0, maxValue])
-			.range([svgDimensions.height - margins.bottom, margins.top]);
-		
-		return (
-			<div
-				className="chart-wrapper"
-				style={{ width: svgDimensions.width, height: svgDimensions.height }}
+	return (
+		<div
+			className="chart-wrapper"
+			style={{ width: svgDimensions.width, height: svgDimensions.height }}
+		>
+			<svg
+				className="responsive-chart"
+				width={svgDimensions.width}
+				height={svgDimensions.height}
 			>
-				<svg
-					className="responsive-chart"
-					width={svgDimensions.width}
-					height={svgDimensions.height}
-				>
-					<Axes
-						scales={{ xScale, yScale }}
-						margins={margins}
-						svgDimensions={svgDimensions}
-					/>
-					<Bars
-						scales={{ xScale, yScale }}
-						margins={margins}
-						data={data}
-						maxValue={maxValue}
-						svgDimensions={svgDimensions}
-					/>
-				</svg>
-				<div
-					className="icons-block"
-					style={{
-						width: svgDimensions.width,
-						paddingLeft: this.getWidth(96.5),
-					}}
-				>
-					{this.renderIcons()}
-				</div>
+				<Axes
+					scales={{ xScale, yScale }}
+					margins={margins}
+					svgDimensions={svgDimensions}
+				/>
+				<Bars
+					scales={{ xScale, yScale }}
+					margins={margins}
+					data={data}
+					maxValue={maxValue}
+					svgDimensions={svgDimensions}
+				/>
+			</svg>
+			<div
+				className="icons-block"
+				style={{
+					width: svgDimensions.width,
+					paddingLeft: getWidth(96.5)
+				}}
+			>
+				{renderIcons()}
 			</div>
-		);
-	}
-}
+		</div>
+	);
+};
 
 export default Chart;

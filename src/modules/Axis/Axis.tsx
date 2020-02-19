@@ -1,6 +1,7 @@
 import * as d3Axis from 'd3-axis';
 import { select as d3Select } from 'd3-selection';
-import { Component, h } from 'preact';
+import { h } from 'preact';
+import { useEffect } from 'preact/hooks';
 
 import './Axis.css';
 
@@ -11,36 +12,29 @@ interface Props {
 	translate: string;
 }
 
-export default class Axis extends Component<Props> {
-	private axisElement: HTMLElement;
-	componentDidMount() {
-		this.renderAxis();
-	}
+const Axis = (props: Props) => {
+	let axisElement = null;
 	
-	componentDidUpdate() {
-		this.renderAxis();
-	}
-	
-	renderAxis() {
-		const axisType = `axis${this.props.orient}`;
+	const renderAxis = () => {
+		const axisType = `axis${props.orient}`;
 		const axis = d3Axis[axisType]()
-			.scale(this.props.scale)
-			.tickSize(-this.props.tickSize)
+			.scale(props.scale)
+			.tickSize(-props.tickSize)
 			.tickPadding([12])
 			.ticks([4]);
 		
-		d3Select(this.axisElement).call(axis);
-	}
+		d3Select(axisElement).call(axis);
+	};
 	
-	render() {
-		return (
-			<g
-				className={`Axis Axis-${this.props.orient}`}
-				ref={el => {
-					this.axisElement = el;
-				}}
-				transform={this.props.translate}
-			/>
-		);
-	}
-}
+	useEffect(renderAxis);
+	
+	return (
+		<g
+			className={`Axis Axis-${props.orient}`}
+			ref={el => axisElement = el}
+			transform={props.translate}
+		/>
+	);
+};
+
+export default Axis;

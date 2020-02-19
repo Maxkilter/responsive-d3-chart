@@ -1,4 +1,4 @@
-import { Component, h } from 'preact';
+import { h } from 'preact';
 
 import Chart from '../Chart';
 
@@ -6,6 +6,7 @@ interface Props {
   path: any;
 }
 
-export default class Home extends Component<Props> {
-  render = () => <Chart />;
-}
+// @ts-ignore
+const Home = (props: Props) => <Chart path={props.path} />;
+
+export default Home;
